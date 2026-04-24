@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Projects – OM ROBOTICS</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, orderBy, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0EdIcfUU5OADGnAjR79HMjESr6HlqEgY",
+  authDomain: "om-electronics-a6b0b.firebaseapp.com",
+  projectId: "om-electronics-a6b0b",
+  storageBucket: "om-electronics-a6b0b.firebasestorage.app",
+  messagingSenderId: "200777399359",
+  appId: "1:200777399359:web:1d1d3096d17b4401000c8a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+window._db = db;
+window._fbModules = { collection, getDocs, query, orderBy, addDoc, serverTimestamp };
+
+// Load projects from Firebase
+async function loadProjectsFromFirebase() {
+  try {
+    const { collection: col, getDocs: get, query: q, orderBy: ob } = window._fbModules;
+    const snap = await get(q(col(db, 'projects'), ob('createdAt', 'desc')));
+    if (!snap.empty) {
+      const data = [];
+      snap.forEach(d => data.push({ id: d.id, ...d.data() }));
+      window._firebaseProjects = data;
+      renderProjects(data);
+      return;
+    }
+  } catch (e) { console.warn('Firebase load failed, using local data:', e); }
+  renderProjects(window._allProjects);
+}
+
+window.addEventListener('DOMContentLoaded', () => setTimeout(loadProjectsFromFirebase, 500));
+
+window.submitEnquiry = async function() {
+  const name    = document.getElementById('eq-name').value.trim();
+  const phone   = document.getElementById('eq-phone').value.trim();
+  const email   = document.getElementById('eq-email').value.trim();
+  const college = document.getElementById('eq-college').value.trim();
+  const project = document.getElementById('eq-project').value.trim();
+  const notes   = document.getElementById('eq-notes').value.trim();
+  if (!name||!phone||!project) { showToast('Missing Info','Name, phone & project are required.','err'); return; }
+  const btn = document.getElementById('eq-btn');
+  btn.disabled = true; btn.textContent = 'Submitting…';
+  try {
+    const { collection: col, addDoc: add, serverTimestamp: sts } = window._fbModules;
+    await add(col(db, 'project_enquiries'), { name, phone, email, college, project, notes, createdAt: sts() });
+    showToast('Enquiry Sent! 🎉', 'We\'ll contact you within 24 hours.');
+    closeEnquiry();
+    btn.textContent = 'Submit Enquiry';
+    btn.disabled = false;
+    ['eq-name','eq-phone','eq-email','eq-college','eq-notes'].forEach(id => document.getElementById(id).value = '');
+  } catch(e) {
+    showToast('Error', e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Submit Enquiry';
+  }
+};
+</script>
+<style>
+:root{
+  --or:#FF6200;--or2:#FF8533;
+  --bk:#0A0A0A;--bk2:#141414;--bk3:#1C1C1C;
+  --wh:#FAFAF7;--wh2:#F0EDE6;
+  --gy:#8A8680;
+  --bd:rgba(255,255,255,0.07);
+  --bdl:rgba(10,10,10,0.10);
+  --rc: #00C896; /* RC green accent */
+  --rb: #4F9EFF; /* Robotics blue */
+  --re: #A78BFF; /* Embedded purple */
+  --rc2: #FFD600; /* Comm yellow */
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bk);color:var(--wh);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+button{font-family:inherit;cursor:pointer;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:800;height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 5%;background:rgba(10,10,10,0.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--bd);}
+.n-logo{font-family:'Bebas Neue',sans-serif;font-size:1.45rem;letter-spacing:3px;color:var(--wh);}
+.n-logo span{color:var(--or);}
+.n-right{display:flex;align-items:center;gap:.55rem;}
+.n-btn{background:transparent;border:1px solid rgba(255,255,255,.14);color:var(--wh);padding:.38rem .85rem;font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:2px;text-transform:uppercase;transition:all .2s;}
+.n-btn:hover{border-color:var(--or);color:var(--or);}
+.n-btn.active{background:var(--or);border-color:var(--or);color:var(--wh);}
+.ham{display:none;flex-direction:column;gap:4.5px;background:none;border:none;padding:5px;cursor:pointer;}
+.ham span{width:20px;height:1.5px;background:var(--wh);display:block;transition:all .28s;}
+.ham.o span:nth-child(1){transform:rotate(45deg) translate(4px,4px);}
+.ham.o span:nth-child(2){opacity:0;}
+.ham.o span:nth-child(3){transform:rotate(-45deg) translate(4px,-4px);}
+.n-menu{display:none;position:fixed;top:58px;left:0;right:0;background:var(--bk);border-bottom:1px solid var(--bd);padding:1.4rem 5%;flex-direction:column;gap:1.1rem;z-index:799;}
+.n-menu.o{display:flex;}
+.n-menu a{font-family:'Space Mono',monospace;font-size:.62rem;letter-spacing:3px;text-transform:uppercase;color:var(--gy);transition:color .2s;}
+.n-menu a:hover{color:var(--or);}
+@media(max-width:600px){.n-btn:not(.n-btn-enq){display:none;}.ham{display:flex;}}
+
+/* ── PAGE HEADER ── */
+.ph{padding:90px 5% 3rem;background:var(--bk2);border-bottom:1px solid var(--bd);position:relative;overflow:hidden;}
+.ph::before{content:'';position:absolute;top:-60px;right:-60px;width:320px;height:320px;border-radius:50%;border:1px solid rgba(255,98,0,0.06);}
+.ph::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--or) 0%,transparent 55%);}
+.ph-tag{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,98,0,0.11);border:1px solid rgba(255,98,0,0.28);padding:.28rem .8rem;margin-bottom:1rem;}
+.ph-tag span{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);}
+.ph-dot{width:5px;height:5px;border-radius:50%;background:var(--or);}
+.ph h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,8vw,4rem);letter-spacing:2px;text-transform:uppercase;line-height:.95;color:var(--wh);}
+.ph h1 em{color:var(--or);font-style:normal;}
+.ph-p{font-size:.88rem;color:rgba(250,250,247,.45);line-height:1.65;max-width:380px;margin-top:.75rem;}
+.ph-stats{display:flex;gap:2rem;flex-wrap:wrap;margin-top:1.5rem;padding-top:1.3rem;border-top:1px solid rgba(255,255,255,.07);}
+.phs-n{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;color:var(--or);line-height:1;}
+.phs-l{font-family:'Space Mono',monospace;font-size:.46rem;letter-spacing:2px;text-transform:uppercase;color:rgba(250,250,247,.3);margin-top:.15rem;}
+
+/* ── TICKER ── */
+.ticker{background:var(--or);padding:.44rem 0;overflow:hidden;white-space:nowrap;}
+.t-inner{display:inline-block;animation:tk 32s linear infinite;}
+@keyframes tk{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+.t-item{display:inline-block;margin:0 1.8rem;font-family:'Bebas Neue',sans-serif;font-size:.88rem;letter-spacing:3px;color:var(--wh);}
+.t-sep{color:rgba(255,255,255,.4);margin:0 .3rem;font-size:.55rem;vertical-align:middle;}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 200px);padding:2rem 5%;gap:1.8rem;}
+
+/* ── SIDEBAR ── */
+.sidebar{width:240px;flex-shrink:0;}
+.sb-section{margin-bottom:1.8rem;}
+.sb-title{font-family:'Space Mono',monospace;font-size:.55rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);margin-bottom:.8rem;padding-bottom:.5rem;border-bottom:1px solid rgba(255,255,255,.07);}
+.search-box{width:100%;background:var(--bk3);border:1px solid rgba(255,255,255,.1);color:var(--wh);padding:.65rem .9rem;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:border-color .2s;}
+.search-box:focus{border-color:var(--or);}
+.search-box::placeholder{color:var(--gy);}
+.cat-pill{display:flex;align-items:center;justify-content:space-between;padding:.42rem .6rem;margin-bottom:.25rem;cursor:pointer;border:1px solid transparent;transition:all .2s;font-size:.82rem;color:var(--gy);}
+.cat-pill:hover{border-color:rgba(255,98,0,.2);color:var(--wh);background:rgba(255,98,0,.05);}
+.cat-pill.active{border-color:var(--or);color:var(--or);background:rgba(255,98,0,.08);}
+.cat-pill .cp-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.cat-pill .cp-count{font-family:'Space Mono',monospace;font-size:.5rem;color:var(--gy);}
+.btn-enq-sidebar{width:100%;background:var(--or);color:var(--wh);border:none;padding:.75rem;font-family:'Space Mono',monospace;font-size:.58rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:background .2s;margin-top:.5rem;}
+.btn-enq-sidebar:hover{background:var(--or2);}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;}
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;flex-wrap:wrap;gap:.7rem;}
+.results-count{font-size:.82rem;color:var(--gy);}
+.results-count strong{color:var(--wh);}
+.sort-sel{background:var(--bk3);border:1px solid rgba(255,255,255,.1);color:var(--wh);padding:.45rem .7rem;font-family:'DM Sans',sans-serif;font-size:.8rem;outline:none;cursor:pointer;}
+.sort-sel option{background:var(--bk3);}
+
+/* ── PROJECT GRID ── */
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.1rem;}
+
+/* ── PROJECT CARD ── */
+.pcard{background:var(--bk2);border:1px solid rgba(255,255,255,.06);overflow:hidden;cursor:pointer;transition:all .28s;position:relative;}
+.pcard:hover{border-color:rgba(255,98,0,.45);transform:translateY(-3px);}
+.pc-head{height:140px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden;}
+.pc-head::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;}
+.pcard[data-cat="RC"] .pc-head{background:linear-gradient(135deg,#0a1a0f,#0f2518);}
+.pcard[data-cat="RC"] .pc-head::after{background:var(--rc);}
+.pcard[data-cat="ROBOTICS"] .pc-head{background:linear-gradient(135deg,#0a0f1a,#0d1425);}
+.pcard[data-cat="ROBOTICS"] .pc-head::after{background:var(--rb);}
+.pcard[data-cat="EMBEDDED"] .pc-head{background:linear-gradient(135deg,#100a1a,#180d25);}
+.pcard[data-cat="EMBEDDED"] .pc-head::after{background:var(--re);}
+.pcard[data-cat="COMMUNICATION"] .pc-head{background:linear-gradient(135deg,#1a150a,#252010);}
+.pcard[data-cat="COMMUNICATION"] .pc-head::after{background:var(--rc2);}
+.pcard[data-cat="CUSTOM"] .pc-head{background:linear-gradient(135deg,#1a0a0a,#250d0d);}
+.pcard[data-cat="CUSTOM"] .pc-head::after{background:var(--or);}
+.pc-badge{position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:.46rem;letter-spacing:1px;font-weight:700;padding:.16rem .55rem;text-transform:uppercase;}
+.pcard[data-cat="RC"] .pc-badge{background:var(--rc);color:#000;}
+.pcard[data-cat="ROBOTICS"] .pc-badge{background:var(--rb);color:#000;}
+.pcard[data-cat="EMBEDDED"] .pc-badge{background:var(--re);color:#000;}
+.pcard[data-cat="COMMUNICATION"] .pc-badge{background:var(--rc2);color:#000;}
+.pcard[data-cat="CUSTOM"] .pc-badge{background:var(--or);color:#000;}
+.pc-diff{position:absolute;top:10px;right:10px;font-family:'Space Mono',monospace;font-size:.44rem;letter-spacing:1px;padding:.16rem .5rem;border:1px solid rgba(255,255,255,.15);color:var(--gy);}
+.pc-body{padding:.85rem;}
+.pc-cat{font-family:'Space Mono',monospace;font-size:.48rem;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:.3rem;}
+.pc-name{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:.5px;line-height:1.1;margin-bottom:.45rem;}
+.pc-desc{font-size:.78rem;color:rgba(250,250,247,.4);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.pc-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.75rem;padding-top:.65rem;border-top:1px solid rgba(255,255,255,.06);}
+.pc-price{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:var(--or);}
+.pc-price small{font-size:.65rem;font-family:'Space Mono',monospace;color:var(--gy);display:block;line-height:1;margin-top:-.1rem;}
+.btn-enquire{background:var(--bk3);color:var(--or);border:1px solid rgba(255,98,0,.25);font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:1px;padding:.38rem .85rem;text-transform:uppercase;transition:all .2s;}
+.btn-enquire:hover{background:var(--or);color:var(--wh);border-color:var(--or);}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:4rem;color:var(--gy);}
+.spinner{display:inline-block;width:28px;height:28px;border:2px solid rgba(255,98,0,.25);border-top-color:var(--or);border-radius:50%;animation:spin .7s linear infinite;margin-bottom:1rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.no-results{text-align:center;padding:4rem 2rem;color:var(--gy);}
+.no-results .nr-icon{font-size:3rem;margin-bottom:1rem;}
+
+/* ── PROJECT DETAIL MODAL ── */
+.pmodal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:5% 1rem 1rem;overflow-y:auto;}
+.pmodal.open{display:flex;}
+.pm-box{background:var(--bk2);border:1px solid rgba(255,98,0,.2);width:100%;max-width:680px;position:relative;}
+.pm-close{position:absolute;top:.85rem;right:.85rem;background:rgba(255,255,255,.08);border:none;color:var(--wh);width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;z-index:10;}
+.pm-img{height:220px;display:flex;align-items:center;justify-content:center;font-size:5rem;position:relative;}
+.pm-info{padding:1.5rem;}
+.pm-cat{font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);margin-bottom:.4rem;}
+.pm-name{font-family:'Bebas Neue',sans-serif;font-size:2rem;letter-spacing:1px;line-height:1;margin-bottom:.65rem;}
+.pm-desc{font-size:.86rem;color:rgba(250,250,247,.5);line-height:1.7;margin-bottom:1.2rem;}
+.pm-features{display:grid;grid-template-columns:1fr 1fr;gap:.4rem;margin-bottom:1.2rem;}
+.pm-feat{display:flex;align-items:center;gap:.45rem;font-size:.8rem;color:rgba(250,250,247,.55);}
+.pm-feat::before{content:'✓';color:var(--or);font-family:'Space Mono',monospace;font-size:.75rem;flex-shrink:0;}
+.pm-price-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.7rem;padding-top:1rem;border-top:1px solid rgba(255,255,255,.07);}
+.pm-price{font-family:'Bebas Neue',sans-serif;font-size:2.2rem;color:var(--or);}
+.pm-price small{font-size:.7rem;font-family:'Space Mono',monospace;color:var(--gy);}
+.btn-pm-enq{background:var(--or);color:var(--wh);border:none;padding:.75rem 1.8rem;font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:background .2s;}
+.btn-pm-enq:hover{background:var(--or2);}
+.pm-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;}
+.pm-tag{font-family:'Space Mono',monospace;font-size:.48rem;letter-spacing:1px;padding:.2rem .55rem;border:1px solid rgba(255,255,255,.12);color:var(--gy);text-transform:uppercase;}
+
+/* ── ENQUIRY MODAL ── */
+.emodal{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:3000;display:none;align-items:center;justify-content:center;padding:1rem;}
+.emodal.open{display:flex;}
+.em-box{background:var(--bk2);border:1px solid rgba(255,98,0,.2);width:100%;max-width:440px;padding:1.8rem;position:relative;}
+.em-close{position:absolute;top:.85rem;right:.85rem;background:rgba(255,255,255,.08);border:none;color:var(--wh);width:28px;height:28px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;}
+.em-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:1px;margin-bottom:.3rem;}
+.em-sub{font-size:.78rem;color:var(--gy);margin-bottom:1.3rem;}
+.fg{margin-bottom:.9rem;}
+.fg label{display:block;font-family:'Space Mono',monospace;font-size:.5rem;letter-spacing:2px;text-transform:uppercase;color:var(--gy);margin-bottom:.4rem;}
+.fg input,.fg select,.fg textarea{width:100%;background:var(--bk3);border:1px solid rgba(255,255,255,.1);color:var(--wh);padding:.6rem .8rem;font-family:'DM Sans',sans-serif;font-size:.86rem;outline:none;transition:border-color .2s;resize:none;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--or);}
+.fg input::placeholder,.fg textarea::placeholder{color:var(--gy);}
+.fg select option{background:var(--bk3);}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+.btn-sub{width:100%;background:var(--or);color:var(--wh);border:none;padding:.8rem;font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:background .2s;margin-top:.3rem;}
+.btn-sub:hover{background:var(--or2);}
+.btn-sub:disabled{background:#444;cursor:not-allowed;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--bk2);border:1px solid var(--bd);border-left:3px solid var(--or);padding:.85rem 1.2rem;min-width:220px;max-width:300px;z-index:9999;transform:translateX(120%);transition:transform .35s cubic-bezier(.16,1,.3,1);}
+.toast.on{transform:translateX(0);}
+.toast-t{font-family:'Space Mono',monospace;font-size:.6rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:.2rem;}
+.toast-m{font-size:.78rem;color:var(--gy);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:780px){
+  .layout{flex-direction:column;padding:1.5rem 4%;}
+  .sidebar{width:100%;}
+  .pgrid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.85rem;}
+}
+@media(max-width:480px){
+  .pgrid{grid-template-columns:1fr 1fr;}
+  .pm-features{grid-template-columns:1fr;}
+  .fg-row{grid-template-columns:1fr;}
+}
+
+/* ── REVEAL ── */
+[data-r]{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;}
+[data-r].on{opacity:1;transform:none;}
+
+/* ── CUSTOM PROJECT BANNER ── */
+.custom-banner{margin:2rem 5% 0;background:linear-gradient(135deg,var(--bk3),var(--bk2));border:1px solid rgba(255,98,0,.2);padding:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.cb-left .cb-l{font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:3px;text-transform:uppercase;color:var(--or);margin-bottom:.3rem;}
+.cb-left .cb-t{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:1px;}
+.cb-left .cb-p{font-size:.8rem;color:var(--gy);margin-top:.2rem;}
+.btn-custom{background:var(--or);color:var(--wh);border:none;padding:.65rem 1.4rem;font-family:'Space Mono',monospace;font-size:.55rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;white-space:nowrap;transition:background .2s;}
+.btn-custom:hover{background:var(--or2);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="index.html" class="n-logo">OM <span>ROBOTICS</span></a>
+  <div class="n-right">
+    <a href="index.html" class="n-btn">Home</a>
+    <a href="shop.html" class="n-btn">Shop</a>
+    <button class="n-btn n-btn-enq active" onclick="openEnquiry()">Enquire Now</button>
+    <button class="ham" id="ham" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="n-menu" id="nMenu">
+  <a href="index.html" onclick="closeMenu()">Home</a>
+  <a href="shop.html" onclick="closeMenu()">Shop Components</a>
+  <a href="#" onclick="closeMenu();openEnquiry()">Enquire About a Project</a>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="ph">
+  <div class="ph-tag"><div class="ph-dot"></div><span>College & Student Projects</span></div>
+  <h1>Student <em>Projects</em><br>That Get Built</h1>
+  <p class="ph-p">Ready-to-submit RC, Robotics, Embedded & Communication projects for engineering students across Chennai.</p>
+  <div class="ph-stats">
+    <div><div class="phs-n" id="total-count">30+</div><div class="phs-l">Projects Available</div></div>
+    <div><div class="phs-n">4</div><div class="phs-l">Categories</div></div>
+    <div><div class="phs-n">10+</div><div class="phs-l">Years Experience</div></div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="t-inner">
+    <span class="t-item">RC Projects</span><span class="t-sep">✦</span>
+    <span class="t-item">Robotics</span><span class="t-sep">✦</span>
+    <span class="t-item">Embedded Systems</span><span class="t-sep">✦</span>
+    <span class="t-item">Communication</span><span class="t-sep">✦</span>
+    <span class="t-item">Custom Build</span><span class="t-sep">✦</span>
+    <span class="t-item">College Projects</span><span class="t-sep">✦</span>
+    <span class="t-item">Final Year</span><span class="t-sep">✦</span>
+    <span class="t-item">RC Projects</span><span class="t-sep">✦</span>
+    <span class="t-item">Robotics</span><span class="t-sep">✦</span>
+    <span class="t-item">Embedded Systems</span><span class="t-sep">✦</span>
+    <span class="t-item">Communication</span><span class="t-sep">✦</span>
+    <span class="t-item">Custom Build</span><span class="t-sep">✦</span>
+    <span class="t-item">College Projects</span><span class="t-sep">✦</span>
+    <span class="t-item">Final Year</span><span class="t-sep">✦</span>
+  </div>
+</div>
+
+<!-- CUSTOM BUILD BANNER -->
+<div class="custom-banner" data-r>
+  <div class="cb-left">
+    <div class="cb-l">Build Your Idea</div>
+    <div class="cb-t">Have a Custom Project in Mind?</div>
+    <div class="cb-p">We design & build fully custom projects for your specifications.</div>
+  </div>
+  <button class="btn-custom" onclick="openEnquiry('custom')">Get Custom Quote →</button>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section" data-r>
+      <div class="sb-title">Search</div>
+      <input class="search-box" id="searchBox" type="text" placeholder="Search projects…" oninput="filterProjects()">
+    </div>
+    <div class="sb-section" data-r>
+      <div class="sb-title">Category</div>
+      <div class="cat-pill active" data-filter="ALL" onclick="setFilter('ALL',this)">
+        <span style="display:flex;align-items:center;gap:.45rem;"><span class="cp-dot" style="background:var(--or)"></span>All Projects</span>
+        <span class="cp-count" id="c-all">0</span>
+      </div>
+      <div class="cat-pill" data-filter="RC" onclick="setFilter('RC',this)">
+        <span style="display:flex;align-items:center;gap:.45rem;"><span class="cp-dot" style="background:var(--rc)"></span>RC Projects</span>
+        <span class="cp-count" id="c-rc">0</span>
+      </div>
+      <div class="cat-pill" data-filter="ROBOTICS" onclick="setFilter('ROBOTICS',this)">
+        <span style="display:flex;align-items:center;gap:.45rem;"><span class="cp-dot" style="background:var(--rb)"></span>Robotics</span>
+        <span class="cp-count" id="c-robotics">0</span>
+      </div>
+      <div class="cat-pill" data-filter="EMBEDDED" onclick="setFilter('EMBEDDED',this)">
+        <span style="display:flex;align-items:center;gap:.45rem;"><span class="cp-dot" style="background:var(--re)"></span>Embedded</span>
+        <span class="cp-count" id="c-embedded">0</span>
+      </div>
+      <div class="cat-pill" data-filter="COMMUNICATION" onclick="setFilter('COMMUNICATION',this)">
+        <span style="display:flex;align-items:center;gap:.45rem;"><span class="cp-dot" style="background:var(--rc2)"></span>Communication</span>
+        <span class="cp-count" id="c-comm">0</span>
+      </div>
+      <div class="cat-pill" data-filter="CUSTOM" onclick="setFilter('CUSTOM',this)">
+        <span style="display:flex;align-items:center;gap:.45rem;"><span class="cp-dot" style="background:var(--or)"></span>Custom / DIY</span>
+        <span class="cp-count" id="c-custom">0</span>
+      </div>
+    </div>
+    <div class="sb-section" data-r>
+      <div class="sb-title">Difficulty</div>
+      <div class="cat-pill active" data-diff="ALL" onclick="setDiff('ALL',this)"><span>All Levels</span></div>
+      <div class="cat-pill" data-diff="Beginner" onclick="setDiff('Beginner',this)"><span>Beginner</span></div>
+      <div class="cat-pill" data-diff="Intermediate" onclick="setDiff('Intermediate',this)"><span>Intermediate</span></div>
+      <div class="cat-pill" data-diff="Advanced" onclick="setDiff('Advanced',this)"><span>Advanced</span></div>
+    </div>
+    <div class="sb-section" data-r>
+      <div class="sb-title">Enquire</div>
+      <button class="btn-enq-sidebar" onclick="openEnquiry()">📩 Send Enquiry</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="toolbar">
+      <div class="results-count"><strong id="res-count">0</strong> projects found</div>
+      <select class="sort-sel" id="sortSel" onchange="filterProjects()">
+        <option value="default">Default Order</option>
+        <option value="az">Name A–Z</option>
+        <option value="za">Name Z–A</option>
+        <option value="low">Price: Low–High</option>
+        <option value="high">Price: High–Low</option>
+      </select>
+    </div>
+    <div class="pgrid" id="projectGrid">
+      <div class="loading"><div class="spinner"></div><br>Loading projects…</div>
+    </div>
+  </main>
+</div>
+
+<!-- PROJECT DETAIL MODAL -->
+<div class="pmodal" id="pModal" onclick="if(event.target===this)closePModal()">
+  <div class="pm-box">
+    <button class="pm-close" onclick="closePModal()">✕</button>
+    <div class="pm-img" id="pm-img"></div>
+    <div class="pm-info">
+      <div class="pm-cat" id="pm-cat"></div>
+      <div class="pm-name" id="pm-name"></div>
+      <div class="pm-tags" id="pm-tags"></div>
+      <div class="pm-desc" id="pm-desc"></div>
+      <div class="pm-features" id="pm-feats"></div>
+      <div class="pm-price-row">
+        <div>
+          <div class="pm-price" id="pm-price"></div>
+          <div style="font-size:.72rem;color:var(--gy);margin-top:.1rem;" id="pm-diff"></div>
+        </div>
+        <button class="btn-pm-enq" id="pm-enq-btn">📩 Enquire About This</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ENQUIRY MODAL -->
+<div class="emodal" id="eModal" onclick="if(event.target===this)closeEnquiry()">
+  <div class="em-box">
+    <button class="em-close" onclick="closeEnquiry()">✕</button>
+    <div class="em-title">Project Enquiry</div>
+    <div class="em-sub">We'll get back to you within 24 hours.</div>
+    <div class="fg-row">
+      <div class="fg"><label>Your Name *</label><input id="eq-name" type="text" placeholder="Full name"></div>
+      <div class="fg"><label>Phone *</label><input id="eq-phone" type="tel" placeholder="+91 XXXXX XXXXX"></div>
+    </div>
+    <div class="fg"><label>Email</label><input id="eq-email" type="email" placeholder="you@example.com"></div>
+    <div class="fg"><label>College / Institution</label><input id="eq-college" type="text" placeholder="Your college name"></div>
+    <div class="fg"><label>Project Interested In *</label>
+      <select id="eq-project">
+        <option value="">— Select a project —</option>
+      </select>
+    </div>
+    <div class="fg"><label>Additional Notes</label><textarea id="eq-notes" rows="3" placeholder="Deadline, special requirements…"></textarea></div>
+    <button class="btn-sub" id="eq-btn" onclick="submitEnquiry()">Submit Enquiry →</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <div class="toast-t" id="toast-t">Done</div>
+  <div class="toast-m" id="toast-m"></div>
+</div>
+
+<!-- FOOTER -->
+<footer style="background:var(--bk2);border-top:1px solid var(--bd);padding:2.5rem 5%;margin-top:3rem;">
+  <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:1.5rem;">
+    <div>
+      <span class="n-logo" style="color:var(--wh)">OM <span style="color:var(--or)">ROBOTICS</span></span>
+      <p style="font-size:.78rem;color:var(--gy);margin-top:.5rem;max-width:220px;">Chennai's trusted project partner for engineering students since 2014.</p>
+    </div>
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:.7rem;">Quick Links</div>
+      <div style="display:flex;flex-direction:column;gap:.4rem;">
+        <a href="index.html" style="font-size:.8rem;color:var(--gy);">Home</a>
+        <a href="shop.html" style="font-size:.8rem;color:var(--gy);">Shop Components</a>
+        <a href="#" onclick="openEnquiry()" style="font-size:.8rem;color:var(--gy);">Enquire</a>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Space Mono',monospace;font-size:.52rem;letter-spacing:2px;text-transform:uppercase;color:var(--or);margin-bottom:.7rem;">Contact</div>
+      <div style="font-size:.8rem;color:var(--gy);line-height:1.7;">Chennai, Tamil Nadu<br>India</div>
+    </div>
+  </div>
+  <div style="margin-top:2rem;padding-top:1rem;border-top:1px solid var(--bd);font-size:.72rem;color:var(--gy);">© 2025 OM Robotics. All rights reserved.</div>
+</footer>
+
+<script>
+// ── ALL PROJECTS (JSON) ──
+const _allProjects = [
+  // RC Projects
+  { id:'rc1', cat:'RC', name:'RC Car using Bluetooth 2WD', emoji:'🚗', difficulty:'Beginner', price:1499, desc:'Build a 2-wheel drive RC car controlled via Bluetooth from your smartphone. Great for beginners in robotics and electronics.', features:['Bluetooth Control','2WD Drive System','Android App Compatible','Full Documentation'], tags:['Arduino','Bluetooth','Motor Driver','L298N'] },
+  { id:'rc2', cat:'RC', name:'RC Car using Bluetooth 4WD', emoji:'🚙', difficulty:'Intermediate', price:1999, desc:'Advanced 4-wheel drive RC car with Bluetooth control. Better traction and stability on rough surfaces.', features:['4WD Traction','Bluetooth HC-05','Speed Control','Source Code Included'], tags:['Arduino','HC-05','L298N','4WD'] },
+  { id:'rc3', cat:'RC', name:'Obstacle Avoiding Bot', emoji:'🤖', difficulty:'Beginner', price:1799, desc:'Autonomous robot that detects and avoids obstacles using ultrasonic sensors. No remote control needed!', features:['Autonomous Navigation','Ultrasonic Sensor','Real-time Detection','LED Indicators'], tags:['Arduino','HC-SR04','Servo','Autonomous'] },
+  { id:'rc4', cat:'RC', name:'Line Follower Bot', emoji:'⚡', difficulty:'Intermediate', price:1599, desc:'Smart robot that follows a black line on white surface using IR sensors. Perfect for automation demos.', features:['IR Sensor Array','PID Control','High Speed','Adjustable Sensitivity'], tags:['Arduino','IR Sensor','PID','Motor'] },
+  { id:'rc5', cat:'RC', name:'Fire Fighting Bot', emoji:'🔥', difficulty:'Advanced', price:2499, desc:'Autonomous robot that detects fire using flame sensors and extinguishes it with a mini water pump.', features:['Flame Detection','Water Pump','Autonomous','Emergency Alert'], tags:['Arduino','Flame Sensor','Water Pump','Servo'] },
+  { id:'rc6', cat:'RC', name:'Line Follower & Obstacle Avoidance Bot', emoji:'🧠', difficulty:'Advanced', price:2199, desc:'Dual-mode robot combining line following and obstacle avoidance in one intelligent unit.', features:['Dual Mode','Smart Switching','IR + Ultrasonic','Full Kit'], tags:['Arduino','HC-SR04','IR','Autonomous'] },
+  { id:'rc7', cat:'RC', name:'Catch Me Bot', emoji:'🎯', difficulty:'Advanced', price:2699, desc:'Interactive bot that tracks and follows a moving object/person using camera or sensor arrays.', features:['Object Tracking','Camera Vision','Servo Pan-Tilt','Remote Override'], tags:['Arduino','Camera','Tracking','Servo'] },
+  { id:'rc8', cat:'RC', name:'Maze Bot', emoji:'🌀', difficulty:'Advanced', price:2899, desc:'Self-navigating robot that solves mazes using wall-following algorithms and sensor fusion.', features:['Maze Solving Algorithm','Multi-sensor Fusion','Logging','Display Output'], tags:['Arduino','Algorithm','Ultrasonic','Display'] },
+  { id:'rc9', cat:'RC', name:'Customizable Bot', emoji:'🔧', difficulty:'Intermediate', price:1899, desc:'Modular robot platform where students can plug in different sensor modules for various functions.', features:['Modular Design','Expandable','Multiple Modes','Open-source Code'], tags:['Arduino','Modular','Sensors','Open-source'] },
+  { id:'rc10', cat:'RC', name:'Climber Bot', emoji:'🧗', difficulty:'Advanced', price:3299, desc:'Wall-climbing robot using vacuum suction or magnetic wheels for vertical surface navigation.', features:['Vertical Climbing','Suction System','Camera Mount','Remote Control'], tags:['Arduino','Suction','Vertical','Camera'] },
+  { id:'rc11', cat:'RC', name:'Gesture Controller', emoji:'🖐️', difficulty:'Intermediate', price:2099, desc:'Control a robot using hand gestures captured by an accelerometer/gyroscope glove.', features:['Gesture Recognition','MPU6050','Wireless','Glove Kit Included'], tags:['Arduino','MPU6050','Gesture','Wireless'] },
+  { id:'rc12', cat:'RC', name:'Crawler Bot', emoji:'🦂', difficulty:'Advanced', price:3499, desc:'Multi-legged crawling robot that mimics insect movement using servo-based legs.', features:['6-Leg Design','Servo Control','Terrain Adaptive','Bio-inspired'], tags:['Arduino','Servo','Hexapod','Multi-leg'] },
+
+  // Robotics Projects
+  { id:'rob1', cat:'ROBOTICS', name:'Spider Crawler', emoji:'🕷️', difficulty:'Advanced', price:3999, desc:'8-legged spider robot with lifelike movement using 16 servo motors. Impressive demo project for robotics.', features:['16 Servo Motors','Spider Gait Algorithm','Remote Control','3D Printed Parts'], tags:['Arduino','Servo','Hexapod','3D Print'] },
+  { id:'rob2', cat:'ROBOTICS', name:'Human Arm Robot', emoji:'💪', difficulty:'Advanced', price:4499, desc:'Robotic arm that mimics human arm movement with 5 degrees of freedom. Controlled via joystick or app.', features:['5 DOF','Joystick Control','Pick & Place','Programmable Sequences'], tags:['Arduino','Servo','DOF','Joystick'] },
+  { id:'rob3', cat:'ROBOTICS', name:'Excavator (JCB / Crane)', emoji:'🏗️', difficulty:'Advanced', price:4999, desc:'Scale model of a JCB excavator or construction crane with hydraulic-like servo motion.', features:['Hydraulic Simulation','Remote Control','Scale Model','Heavy Duty Servos'], tags:['Arduino','Servo','Hydraulic','Remote'] },
+
+  // Embedded Projects
+  { id:'emb1', cat:'EMBEDDED', name:'Digital Clock', emoji:'⏰', difficulty:'Beginner', price:999, desc:'Accurate digital clock using DS3231 RTC module with LCD or 7-segment display. Alarm feature included.', features:['DS3231 RTC','LCD/7-Seg Display','Alarm Function','Battery Backup'], tags:['Arduino','RTC','LCD','DS3231'] },
+  { id:'emb2', cat:'EMBEDDED', name:'Temperature Monitoring System', emoji:'🌡️', difficulty:'Beginner', price:1299, desc:'Real-time temperature and humidity monitoring with DHT22 sensor and OLED display. Logs data to SD card.', features:['DHT22 Sensor','OLED Display','SD Card Logging','Alert Threshold'], tags:['Arduino','DHT22','OLED','SD Card'] },
+  { id:'emb3', cat:'EMBEDDED', name:'Automatic Street Light Control', emoji:'💡', difficulty:'Beginner', price:1199, desc:'Smart street light that automatically turns ON at dusk and OFF at dawn using LDR sensor.', features:['LDR Sensor','Relay Control','Energy Efficient','Adjustable Threshold'], tags:['Arduino','LDR','Relay','Auto'] },
+  { id:'emb4', cat:'EMBEDDED', name:'RFID Based Attendance System', emoji:'📋', difficulty:'Intermediate', price:2299, desc:'Attendance tracking system using RFID cards. Data saved to SD card with timestamp and displayed on LCD.', features:['RFID RC522','LCD Display','SD Card Storage','Timestamp'], tags:['Arduino','RFID','RC522','SD Card'] },
+  { id:'emb5', cat:'EMBEDDED', name:'Face Detection Attendance System', emoji:'👤', difficulty:'Advanced', price:4999, desc:'Computer vision-based attendance system using Raspberry Pi and OpenCV to detect and log student faces.', features:['Face Recognition','Raspberry Pi','OpenCV','CSV Export'], tags:['Raspberry Pi','OpenCV','Python','Camera'] },
+  { id:'emb6', cat:'EMBEDDED', name:'Voice Control Home Automation', emoji:'🏠', difficulty:'Intermediate', price:2799, desc:'Control home appliances using voice commands via a smartphone. Uses Bluetooth and relay modules.', features:['Voice Commands','Bluetooth','4-Channel Relay','App Control'], tags:['Arduino','Bluetooth','Relay','Voice'] },
+  { id:'emb7', cat:'EMBEDDED', name:'Object Detection System', emoji:'🔍', difficulty:'Advanced', price:4499, desc:'Real-time object detection using ESP32-CAM or Raspberry Pi with TensorFlow Lite ML model.', features:['ML Object Detection','ESP32-CAM','Real-time Processing','Serial Monitor'], tags:['ESP32','Camera','ML','TensorFlow'] },
+
+  // Communication Projects
+  { id:'com1', cat:'COMMUNICATION', name:'GSM Based Home Security System', emoji:'🔒', difficulty:'Intermediate', price:2999, desc:'Home security system that sends SMS alerts when motion is detected. Uses PIR sensor and SIM800L GSM module.', features:['GSM SMS Alert','PIR Motion Sensor','Siren Alarm','SIM800L Module'], tags:['Arduino','GSM','SIM800L','PIR'] },
+  { id:'com2', cat:'COMMUNICATION', name:'GPS Vehicle Tracking System', emoji:'📍', difficulty:'Advanced', price:3799, desc:'Real-time GPS vehicle tracker that sends location via GSM to Google Maps. View live on any browser.', features:['GPS Tracking','GSM Transmission','Google Maps Link','Geo-fence Alert'], tags:['Arduino','GPS','GSM','Google Maps'] },
+
+  // Custom
+  { id:'cus1', cat:'CUSTOM', name:'Build Your Own Idea', emoji:'💡', difficulty:'Intermediate', price:0, desc:'Have a unique project idea for your college? We design and build fully custom projects based on your specifications and budget.', features:['Custom Design','Your Specifications','Documentation','Support & Guide'], tags:['Custom','DIY','Flexible','Any Domain'] },
+];
+
+window._allProjects = _allProjects;
+
+let activeFilter = 'ALL';
+let activeDiff   = 'ALL';
+
+function updateCounts(data) {
+  const cats = { RC:0, ROBOTICS:0, EMBEDDED:0, COMMUNICATION:0, CUSTOM:0 };
+  data.forEach(p => cats[p.cat] !== undefined && cats[p.cat]++);
+  document.getElementById('c-all').textContent = data.length;
+  document.getElementById('c-rc').textContent = cats.RC;
+  document.getElementById('c-robotics').textContent = cats.ROBOTICS;
+  document.getElementById('c-embedded').textContent = cats.EMBEDDED;
+  document.getElementById('c-comm').textContent = cats.COMMUNICATION;
+  document.getElementById('c-custom').textContent = cats.CUSTOM;
+  document.getElementById('total-count').textContent = data.length + '+';
+}
+
+function renderProjects(data) {
+  updateCounts(data);
+  filterProjects(data);
+  populateEnquirySelect(data);
+}
+
+function filterProjects(src) {
+  const pool  = src || window._firebaseProjects || window._allProjects;
+  const q     = document.getElementById('searchBox').value.trim().toLowerCase();
+  const sort  = document.getElementById('sortSel').value;
+
+  let filtered = pool.filter(p => {
+    if (activeFilter !== 'ALL' && p.cat !== activeFilter) return false;
+    if (activeDiff   !== 'ALL' && p.difficulty !== activeDiff) return false;
+    if (q && !(p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || (p.tags||[]).some(t=>t.toLowerCase().includes(q)))) return false;
+    return true;
+  });
+
+  if (sort === 'az') filtered.sort((a,b)=>a.name.localeCompare(b.name));
+  else if (sort === 'za') filtered.sort((a,b)=>b.name.localeCompare(a.name));
+  else if (sort === 'low') filtered.sort((a,b)=>a.price-b.price);
+  else if (sort === 'high') filtered.sort((a,b)=>b.price-a.price);
+
+  document.getElementById('res-count').textContent = filtered.length;
+  const grid = document.getElementById('projectGrid');
+
+  // Store in map for modal lookup (ensures imageUrl is always fresh)
+  window._renderedProjectMap = {};
+  filtered.forEach(p => { window._renderedProjectMap[p.id] = p; });
+
+  if (!filtered.length) {
+    grid.innerHTML = `<div class="no-results" style="grid-column:1/-1"><div class="nr-icon">🔍</div><p>No projects match your search.</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = filtered.map(p => `
+    <div class="pcard" data-cat="${p.cat}" onclick="openPModal('${p.id}')">
+      <div class="pc-head" style="${p.imageUrl?'padding:0;overflow:hidden;':''}">
+        ${p.imageUrl
+          ? `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;">`
+          : `<span class="pc-badge">${p.cat === 'COMMUNICATION' ? 'COMM' : p.cat}</span>
+             <span class="pc-diff">${p.difficulty}</span>
+             <span style="font-size:2.8rem;">${p.emoji}</span>`
+        }
+        ${p.imageUrl ? `<span class="pc-badge" style="position:absolute;top:.6rem;left:.6rem;">${p.cat === 'COMMUNICATION' ? 'COMM' : p.cat}</span><span class="pc-diff" style="position:absolute;top:.6rem;right:.6rem;">${p.difficulty}</span>` : ''}
+      </div>
+      <div class="pc-body">
+        <div class="pc-cat">${p.cat === 'COMMUNICATION' ? 'Communication' : p.cat.charAt(0)+p.cat.slice(1).toLowerCase()}</div>
+        <div class="pc-name">${p.name}</div>
+        <div class="pc-desc">${p.desc}</div>
+        <div class="pc-foot">
+          <div class="pc-price">${p.price ? '₹'+p.price.toLocaleString('en-IN') : 'Custom'}<small>${p.price ? 'starting price' : 'quote on request'}</small></div>
+          <button class="btn-enquire" onclick="event.stopPropagation();openEnquiry('${p.id}')">Enquire</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setFilter(f, el) {
+  activeFilter = f;
+  document.querySelectorAll('[data-filter]').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  filterProjects();
+}
+function setDiff(d, el) {
+  activeDiff = d;
+  document.querySelectorAll('[data-diff]').forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  filterProjects();
+}
+
+function getProject(id) {
+  // Search Firebase data first, then local fallback
+  // Firebase projects may have a different id format — search all pools
+  const fb = window._firebaseProjects || [];
+  const local = window._allProjects || [];
+  const pool = fb.length ? fb : local;
+  return pool.find(p => p.id === id);
+}
+
+// Keep a map of id → project for the currently rendered set (includes imageUrl)
+window._renderedProjectMap = {};
+
+function openPModal(id) {
+  // Use the rendered map first (has imageUrl), fall back to pool lookup
+  const p = (window._renderedProjectMap && window._renderedProjectMap[id]) || getProject(id);
+  if (!p) return;
+  if (p.imageUrl) {
+    document.getElementById('pm-img').innerHTML = `<img src="${p.imageUrl}" alt="${p.name}" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+    document.getElementById('pm-img').style.background = '';
+  } else {
+    document.getElementById('pm-img').innerHTML = `<span style="font-size:5rem;">${p.emoji}</span>`;
+    const catMap = {RC:'linear-gradient(135deg,#0a1a0f,#0f2518)',ROBOTICS:'linear-gradient(135deg,#0a0f1a,#0d1425)',EMBEDDED:'linear-gradient(135deg,#100a1a,#180d25)',COMMUNICATION:'linear-gradient(135deg,#1a150a,#252010)',CUSTOM:'linear-gradient(135deg,#1a0a0a,#250d0d)'};
+    document.getElementById('pm-img').style.background = catMap[p.cat] || catMap.CUSTOM;
+  }
+  document.getElementById('pm-img').setAttribute('data-cat', p.cat);
+  document.getElementById('pm-cat').textContent = p.cat;
+  document.getElementById('pm-name').textContent = p.name;
+  document.getElementById('pm-desc').textContent = p.desc;
+  document.getElementById('pm-price').innerHTML = p.price ? `₹${p.price.toLocaleString('en-IN')}<small> starting</small>` : `Custom<small> quote on request</small>`;
+  document.getElementById('pm-diff').textContent = `Difficulty: ${p.difficulty}`;
+  document.getElementById('pm-tags').innerHTML = (p.tags||[]).map(t=>`<span class="pm-tag">${t}</span>`).join('');
+  document.getElementById('pm-feats').innerHTML = (p.features||[]).map(f=>`<div class="pm-feat">${f}</div>`).join('');
+  document.getElementById('pm-enq-btn').onclick = () => { closePModal(); openEnquiry(id); };
+  document.getElementById('pModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePModal() {
+  document.getElementById('pModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function populateEnquirySelect(data) {
+  const sel = document.getElementById('eq-project');
+  sel.innerHTML = '<option value="">— Select a project —</option>' +
+    data.map(p => `<option value="${p.name}">${p.name}</option>`).join('') +
+    '<option value="Custom Project">Custom / My Own Idea</option>';
+}
+
+function openEnquiry(id) {
+  if (id && id !== 'custom') {
+    const p = getProject(id);
+    if (p) document.getElementById('eq-project').value = p.name;
+  } else if (id === 'custom') {
+    document.getElementById('eq-project').value = 'Custom Project';
+  }
+  document.getElementById('eModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeEnquiry() {
+  document.getElementById('eModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+let tTimer;
+function showToast(title, msg, type='ok') {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-t').textContent = title;
+  document.getElementById('toast-m').textContent = msg;
+  t.style.borderLeftColor = type === 'err' ? '#f03' : 'var(--or)';
+  t.classList.add('on');
+  clearTimeout(tTimer);
+  tTimer = setTimeout(() => t.classList.remove('on'), 3500);
+}
+
+function toggleMenu() {
+  document.getElementById('ham').classList.toggle('o');
+  document.getElementById('nMenu').classList.toggle('o');
+}
+function closeMenu() {
+  document.getElementById('ham').classList.remove('o');
+  document.getElementById('nMenu').classList.remove('o');
+}
+
+// Scroll reveal
+const ro = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => { if (e.isIntersecting) setTimeout(() => e.target.classList.add('on'), i * 55); });
+}, { threshold: 0.1 });
+document.querySelectorAll('[data-r]').forEach(el => ro.observe(el));
+
+// Initial render from local data (Firebase will override if connected)
+renderProjects(window._allProjects);
+</script>
+</body>
+</html>
