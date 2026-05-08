@@ -54,7 +54,7 @@ window.submitEnquiry = async function() {
   btn.disabled = true; btn.textContent = 'Submitting…';
   try {
     const { collection: col, addDoc: add, serverTimestamp: sts } = window._fbModules;
-    await add(col(db, 'project_enquiries'), { name, phone, email, college, project, notes, createdAt: sts() });
+    await add(col(window._db, 'project_enquiries'), { name, phone, email, college, project, notes, createdAt: sts() });
     showToast('Enquiry Sent! 🎉', 'We\'ll contact you within 24 hours.');
     closeEnquiry();
     btn.textContent = 'Submit Enquiry';
