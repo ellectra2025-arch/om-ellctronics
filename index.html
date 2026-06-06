@@ -38,6 +38,18 @@
     nav.scrolled { background: rgba(8,8,8,0.93); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(255,85,0,0.12); }
     .nav-logo { font-family: 'Barlow Condensed', sans-serif; font-size: 1.55rem; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; color: var(--white); text-decoration: none; }
     .nav-logo span { color: var(--orange); }
+    .nav-logo-img {
+      height: 42px;
+      width: auto;
+      display: block;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(255,85,0,0.25));
+      transition: filter .25s, transform .25s;
+    }
+    .nav-logo:hover .nav-logo-img {
+      filter: drop-shadow(0 0 12px rgba(255,85,0,0.55));
+      transform: scale(1.04);
+    }
     .nav-links { display: flex; align-items: center; gap: 6px; }
     .nav-links a {
       font-family: 'Barlow Condensed', sans-serif; font-size: 0.88rem; font-weight: 700;
@@ -70,6 +82,22 @@
     }
     @keyframes gridMove { to { background-position: 60px 60px; } }
     .hero-content { position: relative; z-index: 2; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .hero-logo-wrap {
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp .8s .15s forwards;
+    }
+    .hero-logo {
+      height: clamp(70px, 10vw, 110px);
+      width: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 4px 24px rgba(255,85,0,0.4));
+      animation: logoFloat 5s ease-in-out infinite;
+    }
+    @keyframes logoFloat {
+      0%,100% { transform: translateY(0px); }
+      50%      { transform: translateY(-8px); }
+    }
     .hero-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 6px; text-transform: uppercase; color: var(--orange); margin-bottom: 22px; opacity: 0; animation: fadeUp .8s .3s forwards; }
     .hero-title { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(5.5rem, 15vw, 14rem); font-weight: 900; letter-spacing: -2px; line-height: 0.86; text-transform: uppercase; opacity: 0; animation: fadeUp .8s .5s forwards; }
     .hero-title .or { color: var(--orange); display: block; }
@@ -131,6 +159,8 @@
     /* FOOTER */
     footer { border-top: 1px solid rgba(255,85,0,0.1); padding: 32px 48px; display: flex; align-items: center; justify-content: space-between; }
     .fl { font-family: 'Barlow Condensed', sans-serif; font-size: 1.1rem; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; }
+    .fl-logo { height: 38px; width: auto; object-fit: contain; display: block; opacity: 0.88; filter: drop-shadow(0 2px 8px rgba(255,85,0,0.2)); transition: opacity .2s, filter .2s; }
+    .fl-logo:hover { opacity: 1; filter: drop-shadow(0 2px 14px rgba(255,85,0,0.45)); }
     .fl span { color: var(--orange); }
     .fc { font-size: 0.78rem; color: var(--grey); }
     .flinks { display: flex; gap: 24px; }
@@ -155,7 +185,7 @@
 
 <!-- NAV -->
 <nav id="nav">
-  <a href="index.html" class="nav-logo">OM <span>ROBOTICS</span></a>
+  <a href="index.html" class="nav-logo"><img class="nav-logo-img" src="https://raw.githubusercontent.com/projectcentreai-ux/OM-Electronics/main/logo_om-removebg-preview.png" alt="OM ROBOTICS"></a>
   <div class="nav-links">
     <a href="shop.html">Shop</a>
     <a href="project.html">Projects</a>
@@ -175,6 +205,9 @@
   <div class="hero-grid"></div>
 
   <div class="hero-content">
+    <div class="hero-logo-wrap">
+      <img class="hero-logo" src="https://raw.githubusercontent.com/projectcentreai-ux/OM-Electronics/main/logo_om-removebg-preview.png" alt="OM ROBOTICS Logo">
+    </div>
     <div class="hero-eyebrow">Electronics · Robotics · Innovation</div>
     <h1 class="hero-title">
       OM<br/><span class="or">Robotics</span>
@@ -269,7 +302,7 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="fl">OM <span>ROBOTICS</span></div>
+  <div class="fl"><img class="fl-logo" src="https://raw.githubusercontent.com/projectcentreai-ux/OM-Electronics/main/logo_om-removebg-preview.png" alt="OM ROBOTICS"></div>
   <div class="flinks">
     <a href="shop.html">Shop</a>
     <a href="project.html">Projects</a>
