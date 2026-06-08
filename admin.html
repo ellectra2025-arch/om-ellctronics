@@ -207,6 +207,73 @@ select.order-status-sel:focus{border-color:var(--accent);}
 .format-guide p{font-size:0.82rem;color:var(--text2);}
 .format-guide code{background:rgba(99,102,241,0.12);color:var(--accent);padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;}
 
+/* ── BULK ACTIONS PANEL ── */
+/* Danger zone card: red-tinted surface for destructive operations */
+.danger-zone-card{background:linear-gradient(135deg,#fff5f5 0%,#fff 100%);border:1.5px solid #fecaca;border-radius:var(--radius);padding:1.75rem;box-shadow:0 2px 12px rgba(239,68,68,0.06);}
+.danger-zone-card .dz-header{display:flex;align-items:center;gap:0.65rem;margin-bottom:0.5rem;}
+.danger-zone-card .dz-icon{font-size:1.4rem;}
+.danger-zone-card .dz-title{font-family:var(--font2);font-weight:700;font-size:1rem;color:#b91c1c;}
+.danger-zone-card .dz-desc{font-size:0.82rem;color:var(--text2);margin-bottom:1.25rem;line-height:1.55;}
+/* Action row: preview + delete buttons side by side */
+.dz-actions{display:flex;gap:0.75rem;flex-wrap:wrap;}
+/* Preview button — teal/info style */
+.btn-preview{background:#f0f9ff;border:1.5px solid #bae6fd;color:#0369a1;font-weight:600;font-size:0.85rem;padding:0.6rem 1.1rem;border-radius:var(--radius-sm);transition:all .2s;display:inline-flex;align-items:center;gap:0.45rem;}
+.btn-preview:hover{background:#0369a1;border-color:#0369a1;color:#fff;}
+.btn-preview:disabled{opacity:0.5;cursor:not-allowed;}
+/* Destructive delete button — full red */
+.btn-delete-zero{background:#fef2f2;border:1.5px solid #fca5a5;color:var(--danger);font-weight:700;font-size:0.85rem;padding:0.6rem 1.25rem;border-radius:var(--radius-sm);transition:all .2s;display:inline-flex;align-items:center;gap:0.45rem;}
+.btn-delete-zero:hover{background:var(--danger);border-color:var(--danger);color:#fff;}
+.btn-delete-zero:disabled{opacity:0.5;cursor:not-allowed;}
+/* Loading spinner inline */
+.spin{display:inline-block;width:13px;height:13px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin360 .7s linear infinite;vertical-align:middle;}
+@keyframes spin360{to{transform:rotate(360deg);}}
+/* Result banner shown after operation */
+.dz-result{margin-top:1rem;padding:0.85rem 1.1rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:500;display:none;animation:fadeInUp .3s ease;}
+
+/* ── QUICK EDIT POPOVER ── */
+.qe-popover{position:fixed;z-index:3000;background:var(--surface);border:1.5px solid var(--border2);border-radius:12px;box-shadow:0 12px 40px rgba(99,102,241,0.18),0 2px 8px rgba(0,0,0,0.08);padding:1.25rem 1.4rem 1.1rem;width:300px;display:none;animation:fadeInUp .18s ease;}
+.qe-popover.open{display:block;}
+.qe-arrow{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:14px;height:8px;overflow:hidden;}
+.qe-arrow::after{content:'';position:absolute;top:3px;left:50%;transform:translateX(-50%) rotate(45deg);width:10px;height:10px;background:var(--surface);border:1.5px solid var(--border2);border-bottom:none;border-right:none;}
+.qe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;}
+.qe-title{font-family:var(--font2);font-weight:700;font-size:0.88rem;color:var(--text);}
+.qe-close{background:none;border:none;color:var(--text3);font-size:1rem;line-height:1;cursor:pointer;padding:0.1rem 0.3rem;border-radius:4px;transition:color .15s;}
+.qe-close:hover{color:var(--danger);}
+.qe-img-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.85rem;}
+.qe-thumb{width:48px;height:48px;border-radius:8px;border:1.5px solid var(--border);overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.qe-thumb img{width:48px;height:48px;object-fit:cover;}
+.qe-img-controls{flex:1;display:flex;flex-direction:column;gap:0.35rem;}
+.qe-upload-btn{display:flex;align-items:center;gap:0.4rem;background:var(--accent-soft);border:1.5px dashed var(--border2);color:var(--accent);font-size:0.75rem;font-weight:600;padding:0.38rem 0.65rem;border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;width:100%;}
+.qe-upload-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.qe-upload-btn input{display:none;}
+.qe-url-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:0.32rem 0.6rem;border-radius:var(--radius-sm);font-size:0.75rem;outline:none;transition:border-color .18s;}
+.qe-url-input:focus{border-color:var(--accent);}
+.qe-price-row{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.9rem;}
+.qe-price-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text3);white-space:nowrap;}
+.qe-price-inp{flex:1;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:0.38rem 0.65rem;border-radius:var(--radius-sm);font-size:0.88rem;font-weight:600;outline:none;transition:border-color .18s;}
+.qe-price-inp:focus{border-color:var(--accent);}
+.qe-prog{height:3px;background:var(--surface3);border-radius:2px;margin-bottom:0.65rem;display:none;overflow:hidden;}
+.qe-prog-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .3s;}
+.qe-footer{display:flex;justify-content:flex-end;gap:0.5rem;}
+.btn-qe-cancel{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);font-size:0.78rem;font-weight:600;padding:0.35rem 0.75rem;border-radius:var(--radius-sm);transition:all .18s;}
+.btn-qe-cancel:hover{border-color:var(--danger);color:var(--danger);}
+.btn-qe-save{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-size:0.78rem;font-weight:700;padding:0.35rem 0.9rem;border-radius:var(--radius-sm);transition:opacity .18s;}
+.btn-qe-save:hover{opacity:0.88;}
+.btn-qe-save:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-quick{background:linear-gradient(135deg,var(--accent-soft),rgba(139,92,246,0.1));border:1.5px solid var(--border2);color:var(--accent);font-weight:700;font-size:0.75rem;padding:0.28rem 0.6rem;border-radius:var(--radius-sm);transition:all .18s;white-space:nowrap;}
+.btn-quick:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:var(--accent);}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+.dz-result.success{background:#f0fdf4;border:1.5px solid #86efac;color:#166534;}
+.dz-result.error{background:#fef2f2;border:1.5px solid #fca5a5;color:#b91c1c;}
+/* Preview results table inside the panel */
+.dz-preview-wrap{margin-top:1.5rem;display:none;}
+.dz-preview-wrap .dz-count-badge{display:inline-flex;align-items:center;gap:0.4rem;background:#fff7ed;border:1px solid #fdba74;color:#c2410c;padding:0.3rem 0.75rem;border-radius:20px;font-size:0.75rem;font-weight:700;margin-bottom:1rem;}
+.dz-preview-table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+/* Confirmation modal overlay (re-uses existing modal styles + custom content) */
+.confirm-modal-icon{font-size:2.5rem;text-align:center;margin-bottom:0.75rem;}
+.confirm-modal-msg{font-size:0.9rem;color:var(--text2);text-align:center;line-height:1.55;margin-bottom:0.25rem;}
+.confirm-modal-sub{font-size:0.78rem;color:var(--text3);text-align:center;margin-bottom:1.5rem;}
+
 /* ── RESPONSIVE ── */
 @media(max-width:900px){
   .sidebar{left:-240px;}
@@ -271,6 +338,8 @@ select.order-status-sel:focus{border-color:var(--accent);}
       <div class="nav-item" onclick="showPanel('users',this)"><span class="nav-icon">👥</span> Users</div>
       <div class="nav-section-label">Tools</div>
       <div class="nav-item" onclick="showPanel('import',this)"><span class="nav-icon">📥</span> Import Excel</div>
+      <!-- NEW: Bulk Actions nav item for zero-price cleanup -->
+      <div class="nav-item" onclick="showPanel('bulkactions',this)"><span class="nav-icon">🗑️</span> Bulk Actions</div>
       <div class="nav-item" onclick="showPanel('settings',this)"><span class="nav-icon">⚙️</span> Settings</div>
     </nav>
     <div class="sidebar-footer">
@@ -477,6 +546,87 @@ select.order-status-sel:focus{border-color:var(--accent);}
         </div>
       </div>
 
+      <!-- ═══════════════════════════════════════════════════════
+           BULK ACTIONS PANEL
+           Allows admin to preview and batch-delete Firestore
+           documents in the 'components' collection where price==0
+           ══════════════════════════════════════════════════════ -->
+      <div class="panel" id="panel-bulkactions">
+
+        <div class="section-hdr">
+          <h3>Bulk Actions</h3>
+          <span class="badge badge-orange" style="padding:0.35rem 0.75rem;font-size:0.75rem;">⚠️ Destructive operations — use with care</span>
+        </div>
+
+        <!-- ── DANGER ZONE CARD: Zero-Price Components ── -->
+        <div class="danger-zone-card" style="max-width:680px;">
+          <div class="dz-header">
+            <span class="dz-icon">🗑️</span>
+            <span class="dz-title">Delete Components with Price = 0</span>
+          </div>
+          <p class="dz-desc">
+            Finds every document in the <strong>components</strong> collection where
+            <code style="background:rgba(239,68,68,0.08);color:#b91c1c;padding:0.1rem 0.4rem;border-radius:4px;font-size:0.8rem;">price == 0</code>
+            and permanently deletes them using a Firestore batch delete.
+            Use <em>Preview</em> first to review what will be removed before committing.
+          </p>
+
+          <!-- Action buttons row -->
+          <div class="dz-actions">
+            <!-- PREVIEW button: queries Firestore and shows results in table below -->
+            <button
+              class="btn-preview"
+              id="btnPreviewZero"
+              onclick="previewZeroPriceComponents()"
+            >
+              🔍 Preview Components with Price = 0
+            </button>
+
+            <!-- DELETE button: shows confirmation dialog then batch-deletes -->
+            <button
+              class="btn-delete-zero"
+              id="btnDeleteZero"
+              onclick="confirmDeleteZeroPriceComponents()"
+            >
+              🗑️ Delete Components with Price = 0
+            </button>
+          </div>
+
+          <!-- Operation result banner (success / error) — shown after deletion -->
+          <div class="dz-result" id="dzResult"></div>
+        </div><!-- /danger-zone-card -->
+
+        <!-- ── PREVIEW RESULTS SECTION ──
+             Populated by previewZeroPriceComponents().
+             Hidden by default, revealed after preview query. -->
+        <div class="dz-preview-wrap" id="dzPreviewWrap" style="max-width:680px;">
+          <div class="dz-count-badge" id="dzCountBadge">
+            <span>0</span> components found with price = 0
+          </div>
+          <!-- Preview table: name, category, stock, doc ID -->
+          <div class="dz-preview-table-card">
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Photo</th>
+                    <th>Component Name</th>
+                    <th>Category</th>
+                    <th>Stock</th>
+                    <th style="font-family:monospace;font-size:0.68rem;">Document ID</th>
+                  </tr>
+                </thead>
+                <tbody id="dzPreviewBody">
+                  <!-- Rows injected by previewZeroPriceComponents() -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div><!-- /dz-preview-wrap -->
+
+      </div><!-- /panel-bulkactions -->
+
       <!-- SETTINGS -->
       <div class="panel" id="panel-settings">
         <div class="section-hdr"><h3>Website Settings</h3></div>
@@ -575,6 +725,66 @@ select.order-status-sel:focus{border-color:var(--accent);}
   </div>
 </div>
 
+<!-- ═══════════════════════════════════════════════════════
+     ZERO-PRICE DELETE CONFIRMATION MODAL
+     Custom dialog instead of native confirm() for better UX.
+     Shown by confirmDeleteZeroPriceComponents().
+     ══════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="deletePriceZeroModal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <h3>⚠️ Confirm Deletion</h3>
+      <button class="modal-close" onclick="document.getElementById('deletePriceZeroModal').classList.remove('active')">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center;padding:2rem 1.75rem 1.25rem;">
+      <div class="confirm-modal-icon">🗑️</div>
+      <p class="confirm-modal-msg">
+        <strong>Are you sure you want to delete all components with price 0?</strong>
+      </p>
+      <p class="confirm-modal-sub" id="dzConfirmCount">
+        This will permanently remove matching documents from Firestore.<br>
+        This action <strong>cannot be undone</strong>.
+      </p>
+    </div>
+    <div class="modal-footer" style="justify-content:center;gap:1rem;">
+      <!-- Cancel: closes modal, does nothing -->
+      <button class="btn-secondary" onclick="document.getElementById('deletePriceZeroModal').classList.remove('active')">Cancel</button>
+      <!-- Confirm: triggers the actual batch delete -->
+      <button class="btn-delete-zero" id="btnConfirmDelete" onclick="executeDeleteZeroPriceComponents()" style="font-size:0.88rem;padding:0.65rem 1.5rem;">
+        Yes, Delete All
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- QUICK EDIT POPOVER -->
+<div class="qe-popover" id="qePopover">
+  <div class="qe-arrow"></div>
+  <div class="qe-header">
+    <span class="qe-title">⚡ Quick Edit</span>
+    <button class="qe-close" onclick="closeQE()">✕</button>
+  </div>
+  <div class="qe-img-row">
+    <div class="qe-thumb" id="qeThumb">🔩</div>
+    <div class="qe-img-controls">
+      <label class="qe-upload-btn">
+        <input type="file" id="qeFileInput" accept="image/*" onchange="qePreviewFile(this)">
+        📷 Upload Photo
+      </label>
+      <input class="qe-url-input" id="qeUrlInput" type="text" placeholder="Or paste image URL…" oninput="qePreviewUrl(this.value)">
+    </div>
+  </div>
+  <div class="qe-price-row">
+    <span class="qe-price-label">₹ Price</span>
+    <input class="qe-price-inp" id="qePriceInput" type="number" min="0" step="0.01" placeholder="0.00">
+  </div>
+  <div class="qe-prog" id="qeProg"><div class="qe-prog-bar" id="qeProgBar"></div></div>
+  <div class="qe-footer">
+    <button class="btn-qe-cancel" onclick="closeQE()">Cancel</button>
+    <button class="btn-qe-save" id="qeSaveBtn" onclick="saveQE()">Save →</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"><div class="toast-title" id="toastTitle"></div><div class="toast-msg" id="toastMsg"></div></div>
 
 <!-- PANEL SWITCHER (non-module, runs immediately) -->
@@ -585,7 +795,7 @@ function showPanel(name, el){
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   el.classList.add('active');
   updateSidebarArrow();
-  const titles={dashboard:'Dashboard',products:'Products',categories:'Categories',orders:'Orders',users:'Users',import:'Import Excel',settings:'Settings'};
+  const titles={dashboard:'Dashboard',products:'Products',categories:'Categories',orders:'Orders',users:'Users',import:'Import Excel',bulkactions:'Bulk Actions',settings:'Settings'};
   document.getElementById('panelTitle').textContent=titles[name]||name;
   if(name==='orders'&&window._loadOrders) window._loadOrders();
 }
@@ -607,16 +817,24 @@ function showToast(title,msg,type='success'){
   t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),4000);
 }
 window.showToast=showToast;
-['productModal','catModal','orderModal'].forEach(id=>{
+// Close modals when clicking backdrop (includes new confirmation modal)
+['productModal','catModal','orderModal','deletePriceZeroModal'].forEach(id=>{
   const el=document.getElementById(id);
   if(el) el.addEventListener('click',e=>{ if(e.target.id===id) el.classList.remove('active'); });
+});
+// Close quick-edit popover on outside click
+document.addEventListener('click', e => {
+  const pop = document.getElementById('qePopover');
+  if (pop && pop.classList.contains('open') && !pop.contains(e.target) && !e.target.closest('.btn-quick')) {
+    pop.classList.remove('open');
+  }
 });
 </script>
 
 <!-- FIREBASE MODULE -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, serverTimestamp, setDoc, getDoc, query, where, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig={apiKey:"AIzaSyC0EdIcfUU5OADGnAjR79HMjESr6HlqEgY",authDomain:"om-electronics-a6b0b.firebaseapp.com",projectId:"om-electronics-a6b0b",storageBucket:"om-electronics-a6b0b.firebasestorage.app",messagingSenderId:"200777399359",appId:"1:200777399359:web:1d1d3096d17b4401000c8a"};
@@ -729,6 +947,7 @@ function renderProductTable(){
       <td>${p.stock||0}</td>
       <td><span class="badge ${p.enabled?'badge-green':'badge-red'}">${p.enabled?'Active':'Disabled'}</span></td>
       <td><div class="td-actions">
+        <button class="btn-quick" onclick="openQE(event,'${p.id}')">⚡ Photo/Price</button>
         <button class="btn-edit" onclick="editProduct('${p.id}')">Edit</button>
         <button class="btn-success-sm" onclick="toggleProduct('${p.id}',${!p.enabled})">${p.enabled?'Disable':'Enable'}</button>
         <button class="btn-danger" onclick="deleteProduct('${p.id}','${(p.name||'').replace(/'/g,"\\'")}')">Del</button>
@@ -814,6 +1033,115 @@ window.deleteProduct=async(id,name)=>{
   if(!confirm(`Delete "${name}"?`))return;
   try{await deleteDoc(doc(db,'components',id));await loadDashboard();showToast('Deleted',`${name} removed.`);}
   catch(e){showToast('Error',e.message,'error');}
+};
+
+// ── QUICK EDIT (Photo + Price) ──
+let _qeProductId = null;
+let _qePendingFile = null;
+
+window.openQE = function(evt, id) {
+  evt.stopPropagation();
+  const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  _qeProductId = id;
+  _qePendingFile = null;
+
+  // Populate fields
+  const thumb = document.getElementById('qeThumb');
+  thumb.innerHTML = p.imageUrl ? `<img src="${p.imageUrl}" onerror="this.outerHTML='🔩'">` : '🔩';
+  document.getElementById('qeUrlInput').value = p.imageUrl || '';
+  document.getElementById('qePriceInput').value = p.price !== undefined ? p.price : '';
+  document.getElementById('qeFileInput').value = '';
+  document.getElementById('qeProg').style.display = 'none';
+  document.getElementById('qeProgBar').style.width = '0';
+  document.getElementById('qeSaveBtn').disabled = false;
+  document.getElementById('qeSaveBtn').textContent = 'Save →';
+
+  // Position popover near the clicked button
+  const pop = document.getElementById('qePopover');
+  pop.classList.add('open');
+  const btn = evt.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const popW = 300;
+  let left = rect.left + rect.width / 2 - popW / 2;
+  if (left < 8) left = 8;
+  if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+  pop.style.left = left + 'px';
+  const top = rect.bottom + window.scrollY + 10;
+  pop.style.top = top + 'px';
+};
+
+window.closeQE = function() {
+  document.getElementById('qePopover').classList.remove('open');
+  _qeProductId = null;
+  _qePendingFile = null;
+};
+
+window.qePreviewFile = function(input) {
+  const file = input.files[0];
+  if (!file) return;
+  _qePendingFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    document.getElementById('qeThumb').innerHTML = `<img src="${e.target.result}">`;
+  };
+  reader.readAsDataURL(file);
+};
+
+window.qePreviewUrl = function(url) {
+  _qePendingFile = null;
+  const thumb = document.getElementById('qeThumb');
+  if (url) {
+    thumb.innerHTML = `<img src="${url}" onerror="this.outerHTML='🔩'">`;
+  } else {
+    thumb.innerHTML = '🔩';
+  }
+};
+
+window.saveQE = async function() {
+  if (!_qeProductId) return;
+  const saveBtn = document.getElementById('qeSaveBtn');
+  const prog = document.getElementById('qeProg');
+  const bar = document.getElementById('qeProgBar');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+
+  try {
+    let imageUrl = document.getElementById('qeUrlInput').value.trim();
+    const price = parseFloat(document.getElementById('qePriceInput').value) || 0;
+
+    // Upload file if selected
+    if (_qePendingFile) {
+      prog.style.display = 'block';
+      bar.style.width = '30%';
+      const formData = new FormData();
+      formData.append('image', _qePendingFile);
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: formData });
+      bar.style.width = '80%';
+      const data = await res.json();
+      if (!data.success) throw new Error('ImgBB upload failed');
+      imageUrl = data.data.url;
+      bar.style.width = '100%';
+    }
+
+    // Save to Firestore
+    await updateDoc(doc(db, 'components', _qeProductId), { imageUrl, price, updatedAt: serverTimestamp() });
+
+    // Update local state immediately
+    const idx = allProducts.findIndex(x => x.id === _qeProductId);
+    if (idx >= 0) { allProducts[idx].imageUrl = imageUrl; allProducts[idx].price = price; }
+    renderProductTable();
+    renderProdPagination();
+    closeQE();
+    showToast('Saved!', 'Photo and price updated.');
+  } catch (e) {
+    showToast('Error', e.message, 'error');
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save →';
+  } finally {
+    prog.style.display = 'none';
+    bar.style.width = '0';
+  }
 };
 
 function populateCatDropdowns(){
@@ -1035,6 +1363,225 @@ window.previewImage=function(input){
   const reader=new FileReader();
   reader.onload=e=>{document.getElementById('imgPreview').innerHTML=`<img src="${e.target.result}">`;};
   reader.readAsDataURL(file);
+};
+
+// ══════════════════════════════════════════════════════════════════════
+// BULK ACTIONS — Zero-Price Component Management
+// Uses Firebase v9 Modular SDK: query(), where(), writeBatch()
+// ══════════════════════════════════════════════════════════════════════
+
+/**
+ * Caches the last preview snapshot so confirmDeleteZeroPriceComponents()
+ * can show the count in the confirmation dialog without re-querying.
+ */
+let _zeroPriceSnapshot = null;
+
+/**
+ * previewZeroPriceComponents()
+ * ─────────────────────────────
+ * Queries Firestore for components where price == 0.
+ * Displays results in the preview table.
+ * Shows total count badge above the table.
+ * Handles empty results and Firestore errors gracefully.
+ */
+window.previewZeroPriceComponents = async function() {
+  const previewBtn  = document.getElementById('btnPreviewZero');
+  const deleteBtn   = document.getElementById('btnDeleteZero');
+  const previewWrap = document.getElementById('dzPreviewWrap');
+  const previewBody = document.getElementById('dzPreviewBody');
+  const countBadge  = document.getElementById('dzCountBadge');
+  const resultDiv   = document.getElementById('dzResult');
+
+  // ── UI: loading state ──
+  previewBtn.disabled = true;
+  previewBtn.innerHTML = '<span class="spin"></span> Querying Firestore…';
+  resultDiv.style.display = 'none';  // hide any previous result banner
+  previewWrap.style.display = 'none'; // hide stale preview
+
+  try {
+    // ── Query: components collection where price == 0 ──
+    // Uses v9 modular query() + where() — does NOT affect price > 0 docs
+    const zeroPriceQuery = query(
+      collection(db, 'components'),
+      where('price', '==', 0)
+    );
+    const snap = await getDocs(zeroPriceQuery);
+
+    // Cache snapshot for use in the delete confirmation step
+    _zeroPriceSnapshot = snap;
+
+    const count = snap.size;
+
+    // ── Update count badge ──
+    countBadge.innerHTML = `<span style="font-size:1rem;">⚠️</span> <strong>${count}</strong> component${count !== 1 ? 's' : ''} found with price = 0`;
+
+    if (count === 0) {
+      // ── Empty result: nothing to delete ──
+      previewBody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align:center;color:var(--text3);padding:2rem;">
+            ✅ No components with price = 0 found. Nothing to delete.
+          </td>
+        </tr>`;
+    } else {
+      // ── Populate preview rows: name, category, stock, doc ID ──
+      previewBody.innerHTML = snap.docs.map((docSnap, i) => {
+        const d = docSnap.data();
+        const name     = d.name     || '—';
+        const category = d.category || '—';
+        const stock    = d.stock    !== undefined ? d.stock : '—';
+        const docId    = docSnap.id;
+        const photoHtml = d.imageUrl
+          ? `<div class="td-img"><img src="${d.imageUrl}" alt="" onerror="this.parentNode.innerHTML='🔩'"></div>`
+          : `<div class="td-img" style="font-size:0.85rem;">🔩</div>`;
+        return `
+          <tr>
+            <td style="color:var(--text3);font-size:0.78rem;">${i + 1}</td>
+            <td>${photoHtml}</td>
+            <td style="font-weight:600;color:var(--text);">${name}</td>
+            <td><span class="badge badge-gray">${category}</span></td>
+            <td>${stock}</td>
+            <td style="font-family:monospace;font-size:0.72rem;color:var(--text3);word-break:break-all;">${docId}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    // Show preview section
+    previewWrap.style.display = 'block';
+
+  } catch (err) {
+    // ── Firestore error: show error banner ──
+    resultDiv.textContent = '❌ Preview failed: ' + (err.message || 'Unknown Firestore error.');
+    resultDiv.className = 'dz-result error';
+    resultDiv.style.display = 'block';
+    _zeroPriceSnapshot = null;
+  } finally {
+    // ── Restore button state ──
+    previewBtn.disabled = false;
+    previewBtn.innerHTML = '🔍 Preview Components with Price = 0';
+  }
+};
+
+/**
+ * confirmDeleteZeroPriceComponents()
+ * ────────────────────────────────────
+ * Shows the custom confirmation modal before deleting.
+ * Updates modal sub-text with the last known count (if preview was run).
+ * If preview has not been run yet, the modal shows a generic warning.
+ */
+window.confirmDeleteZeroPriceComponents = function() {
+  const subText  = document.getElementById('dzConfirmCount');
+  const modal    = document.getElementById('deletePriceZeroModal');
+
+  // Enrich the modal with count from last preview if available
+  if (_zeroPriceSnapshot !== null) {
+    const n = _zeroPriceSnapshot.size;
+    if (n === 0) {
+      showToast('Nothing to delete', 'No components with price = 0 were found.', 'warning');
+      return; // abort — nothing to delete
+    }
+    subText.innerHTML = `This will permanently remove <strong>${n} document${n !== 1 ? 's' : ''}</strong> from Firestore.<br>This action <strong>cannot be undone</strong>.`;
+  } else {
+    subText.innerHTML = `This will permanently remove all components with price = 0 from Firestore.<br>Run <em>Preview</em> first to see what will be deleted. This action <strong>cannot be undone</strong>.`;
+  }
+
+  modal.classList.add('active');
+};
+
+/**
+ * executeDeleteZeroPriceComponents()
+ * ────────────────────────────────────
+ * Called when the user confirms deletion in the modal.
+ * 1. Closes the confirmation modal.
+ * 2. Queries Firestore fresh (or reuses snapshot) for price == 0 docs.
+ * 3. Batch-deletes in chunks of 500 (Firestore batch limit).
+ * 4. Shows success toast + result banner with count deleted.
+ * 5. Handles empty results and Firestore errors.
+ * 6. Refreshes the product table so deleted items disappear immediately.
+ */
+window.executeDeleteZeroPriceComponents = async function() {
+  const modal      = document.getElementById('deletePriceZeroModal');
+  const confirmBtn = document.getElementById('btnConfirmDelete');
+  const deleteBtn  = document.getElementById('btnDeleteZero');
+  const previewBtn = document.getElementById('btnPreviewZero');
+  const resultDiv  = document.getElementById('dzResult');
+  const previewWrap= document.getElementById('dzPreviewWrap');
+
+  // ── Close modal, enter loading state ──
+  modal.classList.remove('active');
+  confirmBtn.disabled = true;
+  deleteBtn.disabled  = true;
+  previewBtn.disabled = true;
+  deleteBtn.innerHTML = '<span class="spin"></span> Deleting…';
+  resultDiv.style.display = 'none';
+
+  try {
+    // ── Always do a fresh query to ensure accuracy ──
+    // (don't rely solely on cached snapshot in case data changed)
+    const zeroPriceQuery = query(
+      collection(db, 'components'),
+      where('price', '==', 0)
+    );
+    const snap = await getDocs(zeroPriceQuery);
+    const totalFound = snap.size;
+
+    // ── Handle empty result ──
+    if (totalFound === 0) {
+      resultDiv.textContent = '✅ No components with price = 0 found. Nothing was deleted.';
+      resultDiv.className   = 'dz-result success';
+      resultDiv.style.display = 'block';
+      showToast('Nothing to delete', 'No components with price = 0 exist.', 'warning');
+      return;
+    }
+
+    // ── Firestore batch delete (max 500 ops per batch) ──
+    // Split documents into chunks of 500 to respect Firestore batch limit
+    const FIRESTORE_BATCH_LIMIT = 500;
+    const docs = snap.docs;
+    let deletedCount = 0;
+
+    for (let i = 0; i < docs.length; i += FIRESTORE_BATCH_LIMIT) {
+      const chunk = docs.slice(i, i + FIRESTORE_BATCH_LIMIT);
+      const batch = writeBatch(db); // create a new batch for each chunk
+
+      chunk.forEach(docSnap => {
+        batch.delete(doc(db, 'components', docSnap.id));
+      });
+
+      await batch.commit(); // commit chunk atomically
+      deletedCount += chunk.length;
+    }
+
+    // ── Success: update UI ──
+    _zeroPriceSnapshot = null; // clear stale cache
+    previewWrap.style.display = 'none'; // hide stale preview table
+
+    resultDiv.innerHTML = `✅ Successfully deleted <strong>${deletedCount}</strong> component${deletedCount !== 1 ? 's' : ''} with price = 0.`;
+    resultDiv.className = 'dz-result success';
+    resultDiv.style.display = 'block';
+
+    showToast(
+      'Deletion Complete',
+      `${deletedCount} component${deletedCount !== 1 ? 's' : ''} with price = 0 removed.`
+    );
+
+    // ── Refresh product list so deleted items disappear from Products panel ──
+    await loadDashboard();
+
+  } catch (err) {
+    // ── Firestore error: show error banner ──
+    resultDiv.textContent = '❌ Deletion failed: ' + (err.message || 'Unknown Firestore error.');
+    resultDiv.className = 'dz-result error';
+    resultDiv.style.display = 'block';
+
+    showToast('Deletion Failed', err.message || 'Firestore error occurred.', 'error');
+  } finally {
+    // ── Always restore button states ──
+    confirmBtn.disabled = false;
+    deleteBtn.disabled  = false;
+    previewBtn.disabled = false;
+    deleteBtn.innerHTML = '🗑️ Delete Components with Price = 0';
+  }
 };
 
 </script>
