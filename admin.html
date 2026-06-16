@@ -152,10 +152,23 @@ input,select,textarea{font-family:var(--font);}
 .badge-blue{background:var(--accent-soft);color:var(--accent);border:1px solid var(--border2);}
 
 /* ── PAGINATION ── */
-.pagination{display:flex;justify-content:center;gap:0.3rem;padding:1rem;border-top:1px solid var(--border);}
+.pagination{display:flex;align-items:center;justify-content:center;gap:0.75rem;padding:0.9rem 1.25rem;border-top:1px solid var(--border);flex-wrap:nowrap;}
 .page-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text2);padding:0.35rem 0.65rem;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:500;transition:all .15s;}
 .page-btn:hover{border-color:var(--accent);color:var(--accent);}
 .page-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* ── SLIDER PAGINATION ── */
+.pg-nav-btn{background:var(--surface);border:1.5px solid var(--border);color:var(--text2);width:30px;height:30px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;transition:all .15s;line-height:1;}
+.pg-nav-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent);background:var(--accent-soft);}
+.pg-nav-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.pg-slider-wrap{flex:1;max-width:260px;min-width:80px;display:flex;flex-direction:column;align-items:center;gap:0.3rem;}
+.pg-label{font-size:0.72rem;font-weight:600;color:var(--text3);letter-spacing:0.3px;white-space:nowrap;}
+.pg-label span{color:var(--accent);font-weight:700;}
+.pg-slider{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:3px;background:var(--surface3);outline:none;cursor:pointer;transition:background .2s;}
+.pg-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:2px solid #fff;box-shadow:0 1px 6px rgba(99,102,241,0.4);cursor:pointer;transition:transform .15s;}
+.pg-slider::-webkit-slider-thumb:hover{transform:scale(1.2);}
+.pg-slider::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent2));border:2px solid #fff;box-shadow:0 1px 6px rgba(99,102,241,0.4);cursor:pointer;}
+.pg-total{font-size:0.7rem;color:var(--text3);white-space:nowrap;}
 
 /* ── MODAL ── */
 .modal-overlay{position:fixed;inset:0;background:rgba(15,17,23,0.4);backdrop-filter:blur(6px);z-index:2000;display:none;align-items:flex-start;justify-content:center;padding:2rem 1rem;overflow-y:auto;}
@@ -838,12 +851,12 @@ select.order-status-sel:focus{border-color:var(--accent);}
         <input type="file" id="qeFileInput" accept="image/*" onchange="qePreviewFile(this)">
         📷 Upload Photo
       </label>
-      <input class="qe-url-input" id="qeUrlInput" type="text" placeholder="Or paste image URL…" oninput="qePreviewUrl(this.value)">
+      <input class="qe-url-input" id="qeUrlInput" type="text" placeholder="Or paste image URL…" oninput="qePreviewUrl(this.value)" onkeydown="if(event.key==='Enter')document.getElementById('qePriceInput').focus()">
     </div>
   </div>
   <div class="qe-price-row">
     <span class="qe-price-label">₹ Price</span>
-    <input class="qe-price-inp" id="qePriceInput" type="number" min="0" step="0.01" placeholder="0.00">
+    <input class="qe-price-inp" id="qePriceInput" type="number" min="0" step="0.01" placeholder="0.00" onkeydown="if(event.key==='Enter'&&!document.getElementById('qeSaveBtn').disabled)saveQE()">
   </div>
   <div class="qe-prog" id="qeProg"><div class="qe-prog-bar" id="qeProgBar"></div></div>
   <div class="qe-footer">
@@ -1022,13 +1035,55 @@ function renderProdPagination(){
   el.innerHTML='';
   if(total<=1){el.style.display='none';return;}
   el.style.display='flex';
-  for(let i=1;i<=total;i++){
-    const btn=document.createElement('button');
-    btn.className='page-btn'+(i===prodPage?' active':'');
-    btn.textContent=i;
-    btn.onclick=()=>{prodPage=i;renderProductTable();renderProdPagination();};
-    el.appendChild(btn);
-  }
+
+  // Prev button
+  const prevBtn=document.createElement('button');
+  prevBtn.className='pg-nav-btn';
+  prevBtn.innerHTML='&#8592;';
+  prevBtn.title='Previous page';
+  prevBtn.disabled=(prodPage===1);
+  prevBtn.onclick=()=>{if(prodPage>1){prodPage--;renderProductTable();renderProdPagination();}};
+  el.appendChild(prevBtn);
+
+  // Slider wrapper
+  const wrap=document.createElement('div');
+  wrap.className='pg-slider-wrap';
+
+  const label=document.createElement('div');
+  label.className='pg-label';
+  label.innerHTML=`Page <span id="pgCurLabel">${prodPage}</span> of ${total}`;
+
+  const slider=document.createElement('input');
+  slider.type='range';
+  slider.className='pg-slider';
+  slider.min=1;
+  slider.max=total;
+  slider.value=prodPage;
+  slider.id='pgSliderInput';
+
+  // Live label update while dragging
+  slider.oninput=function(){
+    document.getElementById('pgCurLabel').textContent=this.value;
+  };
+  // Navigate on release
+  slider.onchange=function(){
+    prodPage=parseInt(this.value);
+    renderProductTable();
+    renderProdPagination();
+  };
+
+  wrap.appendChild(label);
+  wrap.appendChild(slider);
+  el.appendChild(wrap);
+
+  // Next button
+  const nextBtn=document.createElement('button');
+  nextBtn.className='pg-nav-btn';
+  nextBtn.innerHTML='&#8594;';
+  nextBtn.title='Next page';
+  nextBtn.disabled=(prodPage===total);
+  nextBtn.onclick=()=>{if(prodPage<total){prodPage++;renderProductTable();renderProdPagination();}};
+  el.appendChild(nextBtn);
 }
 
 window.openProductModal=function(){
