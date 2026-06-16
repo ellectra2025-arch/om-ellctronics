@@ -243,36 +243,48 @@ select.order-status-sel:focus{border-color:var(--accent);}
 .dz-result{margin-top:1rem;padding:0.85rem 1.1rem;border-radius:var(--radius-sm);font-size:0.85rem;font-weight:500;display:none;animation:fadeInUp .3s ease;}
 
 /* ── QUICK EDIT POPOVER ── */
-.qe-backdrop{position:fixed;inset:0;z-index:2900;background:rgba(15,17,23,0.25);backdrop-filter:blur(2px);display:none;}
+.qe-backdrop{position:fixed;inset:0;z-index:2900;background:rgba(15,17,23,0.3);backdrop-filter:blur(3px);display:none;}
 .qe-backdrop.open{display:block;}
-.qe-popover{position:fixed;z-index:3000;background:var(--surface);border:1.5px solid var(--border2);border-radius:14px;box-shadow:0 20px 60px rgba(99,102,241,0.22),0 4px 16px rgba(0,0,0,0.1);padding:1.35rem 1.5rem 1.2rem;width:320px;display:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:fadeInUp .2s ease;}
+.qe-popover{position:fixed;z-index:3000;background:var(--surface);border:1.5px solid var(--border2);border-radius:16px;box-shadow:0 24px 64px rgba(99,102,241,0.24),0 4px 16px rgba(0,0,0,0.1);padding:1.4rem 1.5rem 1.25rem;width:330px;display:none;top:50%;left:50%;transform:translate(-50%,-50%);animation:fadeInUp .18s ease;}
 .qe-popover.open{display:block;}
 .qe-arrow{display:none;}
-.qe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.9rem;}
-.qe-title{font-family:var(--font2);font-weight:700;font-size:0.88rem;color:var(--text);}
+.qe-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;}
+.qe-title{font-family:var(--font2);font-weight:700;font-size:0.9rem;color:var(--text);}
 .qe-close{background:none;border:none;color:var(--text3);font-size:1rem;line-height:1;cursor:pointer;padding:0.1rem 0.3rem;border-radius:4px;transition:color .15s;}
 .qe-close:hover{color:var(--danger);}
-.qe-img-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.85rem;}
-.qe-thumb{width:48px;height:48px;border-radius:8px;border:1.5px solid var(--border);overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
-.qe-thumb img{width:48px;height:48px;object-fit:cover;}
+/* photo row */
+.qe-img-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;}
+.qe-thumb{width:52px;height:52px;border-radius:10px;border:1.5px solid var(--border);overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.qe-thumb img{width:52px;height:52px;object-fit:cover;}
 .qe-img-controls{flex:1;display:flex;flex-direction:column;gap:0.35rem;}
 .qe-upload-btn{display:flex;align-items:center;gap:0.4rem;background:var(--accent-soft);border:1.5px dashed var(--border2);color:var(--accent);font-size:0.75rem;font-weight:600;padding:0.38rem 0.65rem;border-radius:var(--radius-sm);cursor:pointer;transition:all .18s;width:100%;}
 .qe-upload-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
 .qe-upload-btn input{display:none;}
 .qe-url-input{width:100%;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:0.32rem 0.6rem;border-radius:var(--radius-sm);font-size:0.75rem;outline:none;transition:border-color .18s;}
-.qe-url-input:focus{border-color:var(--accent);}
-.qe-price-row{display:flex;align-items:center;gap:0.5rem;margin-bottom:0.9rem;}
-.qe-price-label{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.4px;color:var(--text3);white-space:nowrap;}
-.qe-price-inp{flex:1;background:var(--surface2);border:1.5px solid var(--border);color:var(--text);padding:0.38rem 0.65rem;border-radius:var(--radius-sm);font-size:0.88rem;font-weight:600;outline:none;transition:border-color .18s;}
-.qe-price-inp:focus{border-color:var(--accent);}
-.qe-prog{height:3px;background:var(--surface3);border-radius:2px;margin-bottom:0.65rem;display:none;overflow:hidden;}
+.qe-url-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+/* price row — bigger, keyboard-first */
+.qe-price-row{display:flex;align-items:stretch;gap:0;margin-bottom:1rem;border:1.5px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;transition:border-color .18s,box-shadow .18s;}
+.qe-price-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+.qe-price-label{font-size:0.8rem;font-weight:700;letter-spacing:0.3px;color:var(--surface);background:linear-gradient(135deg,var(--accent),var(--accent2));padding:0 0.85rem;display:flex;align-items:center;white-space:nowrap;flex-shrink:0;}
+.qe-price-inp{flex:1;background:var(--surface2);border:none;color:var(--text);padding:0.65rem 0.75rem;font-size:1.05rem;font-weight:700;outline:none;min-width:0;}
+/* enter hint badge */
+.qe-enter-hint{display:flex;align-items:center;gap:0.3rem;font-size:0.68rem;color:var(--text3);padding:0 0.6rem;background:var(--surface2);border-left:1px solid var(--border);flex-shrink:0;}
+.qe-enter-key{display:inline-flex;align-items:center;justify-content:center;background:var(--surface);border:1.5px solid var(--border);border-radius:4px;padding:0.1rem 0.35rem;font-size:0.65rem;font-weight:700;color:var(--accent);line-height:1.4;box-shadow:0 1px 0 var(--border);}
+.qe-enter-key.active{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(0.92);box-shadow:none;}
+/* progress */
+.qe-prog{height:3px;background:var(--surface3);border-radius:2px;margin-bottom:0.75rem;display:none;overflow:hidden;}
 .qe-prog-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%;transition:width .3s;}
-.qe-footer{display:flex;justify-content:flex-end;gap:0.5rem;}
-.btn-qe-cancel{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);font-size:0.78rem;font-weight:600;padding:0.35rem 0.75rem;border-radius:var(--radius-sm);transition:all .18s;}
+/* footer */
+.qe-footer{display:flex;justify-content:space-between;align-items:center;gap:0.5rem;}
+.qe-esc-hint{font-size:0.68rem;color:var(--text3);}
+.qe-esc-key{display:inline-flex;align-items:center;justify-content:center;background:var(--surface2);border:1.5px solid var(--border);border-radius:4px;padding:0.08rem 0.4rem;font-size:0.65rem;font-weight:700;color:var(--text3);line-height:1.4;box-shadow:0 1px 0 var(--border);}
+.qe-footer-btns{display:flex;gap:0.5rem;}
+.btn-qe-cancel{background:var(--surface2);border:1.5px solid var(--border);color:var(--text2);font-size:0.78rem;font-weight:600;padding:0.38rem 0.85rem;border-radius:var(--radius-sm);transition:all .18s;}
 .btn-qe-cancel:hover{border-color:var(--danger);color:var(--danger);}
-.btn-qe-save{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-size:0.78rem;font-weight:700;padding:0.35rem 0.9rem;border-radius:var(--radius-sm);transition:opacity .18s;}
+.btn-qe-save{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;font-size:0.78rem;font-weight:700;padding:0.38rem 1rem;border-radius:var(--radius-sm);transition:opacity .18s;display:inline-flex;align-items:center;gap:0.35rem;}
 .btn-qe-save:hover{opacity:0.88;}
 .btn-qe-save:disabled{opacity:0.5;cursor:not-allowed;}
+.btn-qe-save .save-enter-badge{background:rgba(255,255,255,0.25);border-radius:3px;padding:0.05rem 0.3rem;font-size:0.65rem;font-weight:800;letter-spacing:0.3px;}
 .btn-quick{background:linear-gradient(135deg,var(--accent-soft),rgba(139,92,246,0.1));border:1.5px solid var(--border2);color:var(--accent);font-weight:700;font-size:0.75rem;padding:0.28rem 0.6rem;border-radius:var(--radius-sm);transition:all .18s;white-space:nowrap;}
 .btn-quick:hover{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;border-color:var(--accent);}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
@@ -842,7 +854,7 @@ select.order-status-sel:focus{border-color:var(--accent);}
   <div class="qe-arrow"></div>
   <div class="qe-header">
     <span class="qe-title">⚡ Quick Edit</span>
-    <button class="qe-close" onclick="closeQE()">✕</button>
+    <button class="qe-close" onclick="closeQE()" title="Esc">✕</button>
   </div>
   <div class="qe-img-row">
     <div class="qe-thumb" id="qeThumb">🔩</div>
@@ -851,17 +863,28 @@ select.order-status-sel:focus{border-color:var(--accent);}
         <input type="file" id="qeFileInput" accept="image/*" onchange="qePreviewFile(this)">
         📷 Upload Photo
       </label>
-      <input class="qe-url-input" id="qeUrlInput" type="text" placeholder="Or paste image URL…" oninput="qePreviewUrl(this.value)" onkeydown="if(event.key==='Enter')document.getElementById('qePriceInput').focus()">
+      <input class="qe-url-input" id="qeUrlInput" type="text" placeholder="Paste image URL… then Tab ↹"
+        oninput="qePreviewUrl(this.value)"
+        onkeydown="if(event.key==='Enter'||event.key==='Tab'){event.preventDefault();document.getElementById('qePriceInput').focus();document.getElementById('qePriceInput').select();}">
     </div>
   </div>
-  <div class="qe-price-row">
-    <span class="qe-price-label">₹ Price</span>
-    <input class="qe-price-inp" id="qePriceInput" type="number" min="0" step="0.01" placeholder="0.00" onkeydown="if(event.key==='Enter'&&!document.getElementById('qeSaveBtn').disabled)saveQE()">
+  <div class="qe-price-row" id="qePriceRow">
+    <span class="qe-price-label">₹</span>
+    <input class="qe-price-inp" id="qePriceInput" type="number" min="0" step="0.01" placeholder="0.00"
+      onkeydown="qePriceKeydown(event)"
+      onfocus="document.getElementById('qeEnterKey').classList.add('active')"
+      onblur="document.getElementById('qeEnterKey').classList.remove('active')">
+    <div class="qe-enter-hint">
+      <span class="qe-enter-key" id="qeEnterKey">↵</span>
+    </div>
   </div>
   <div class="qe-prog" id="qeProg"><div class="qe-prog-bar" id="qeProgBar"></div></div>
   <div class="qe-footer">
-    <button class="btn-qe-cancel" onclick="closeQE()">Cancel</button>
-    <button class="btn-qe-save" id="qeSaveBtn" onclick="saveQE()">Save →</button>
+    <span class="qe-esc-hint"><span class="qe-esc-key">Esc</span> cancel</span>
+    <div class="qe-footer-btns">
+      <button class="btn-qe-cancel" onclick="closeQE()">Cancel</button>
+      <button class="btn-qe-save" id="qeSaveBtn" onclick="saveQE()">Save <span class="save-enter-badge">↵</span></button>
+    </div>
   </div>
 </div>
 
@@ -1183,6 +1206,41 @@ window.closeQE = function() {
   document.getElementById('qeBackdrop').classList.remove('open');
   _qeProductId = null;
   _qePendingFile = null;
+};
+
+// Enter → save, Escape → close, arrow keys nudge price
+window.qePriceKeydown = function(e) {
+  const btn = document.getElementById('qeSaveBtn');
+  if (e.key === 'Enter') {
+    if (!btn.disabled) {
+      // Flash the Enter key badge
+      const ek = document.getElementById('qeEnterKey');
+      ek.classList.add('active');
+      setTimeout(() => ek.classList.remove('active'), 180);
+      saveQE();
+    }
+    e.preventDefault();
+  } else if (e.key === 'Escape') {
+    closeQE();
+  }
+};
+
+// Global Escape to close QE
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('qePopover').classList.contains('open')) {
+    closeQE();
+  }
+});
+
+// Auto-focus price when QE opens
+const _origOpenQE = window.openQE;
+window.openQE = function(evt, id) {
+  _origOpenQE(evt, id);
+  // Small delay so popover is visible before focusing
+  setTimeout(() => {
+    const p = document.getElementById('qePriceInput');
+    if (p) { p.focus(); p.select(); }
+  }, 80);
 };
 
 window.qePreviewFile = function(input) {
